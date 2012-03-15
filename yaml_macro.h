@@ -31,7 +31,6 @@
       yaml_parser_delete(&parser);              \
       return 0;                                 \
     }                                           \
-  print_yaml_event(event.type,&event);          \
 
 #define MACRO_YAML_INT(config_name,program_name,func)                   \
   if(!strcmp((char *)event.data.scalar.value,(config_name)))            \
