@@ -7,6 +7,7 @@
 #define CONFIG_SDRAM_ADDRESS "SDRAMaddress"
 #define CONFIG_PORT "Port"
 #define CONFIG_EXECUTABLES "Exec"
+#define CONFIG_FILE_NAME "~/.lpc3250.yaml"
 
 typedef struct
 {
