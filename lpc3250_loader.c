@@ -37,7 +37,7 @@ main (int argc, char *argv[], char *env[])
   wordfree (&we);
 
   printf ("lpc3250_loader\n");
-  printf ("Use config: %s\n", conf_file_n);
+  printf ("Use config: %s\n\n", conf_file_n);
 
   read_config_yaml (conf_file_n, &config);
 
@@ -50,7 +50,7 @@ main (int argc, char *argv[], char *env[])
       printf ("SecondaryFileName: %s\n", config.executables[i].secondary_filename);
       printf ("SDRAMaddress: %x\n", config.executables[i].sdram_address);
     }
-
+  printf ("\n");
   port_fd = open (config.port, O_RDWR | O_NOCTTY | O_NDELAY);
 
   setup_port (port_fd);
@@ -99,6 +99,7 @@ wait_byte (int port_fd, char byte, int skip)
   int               ok;
   int               i;
   int               wait_time;
+  char              byte_s[2];
 
   wait_time = 100;
   if (skip)
@@ -106,14 +107,18 @@ wait_byte (int port_fd, char byte, int skip)
 
   ok = 0;
   answer[1] = 0;
-  printf ("Waiting...\n");
+  byte_s[0] = byte;
+  printf ("Waiting for '%s' ... ", byte_s);
   poller.fd = port_fd;
   poller.events = POLLIN;
   poller.revents = 0;
   ok = poll (&poller, 1, wait_time);
 
   if (ok == 0)
-    return 0;
+    {
+      printf ("error\n");
+      return 0;
+    }
 
   ioctl (port_fd, FIONREAD, &bytes);
 
@@ -134,17 +139,27 @@ wait_byte (int port_fd, char byte, int skip)
 
   if (answer[0] != byte)
     {
-      printf ("bad answer\n");
+      printf ("error\n");
       return 0;
     }
-  printf ("good answer\n");
+  printf ("ok\n");
   return 1;
 }
 
 int
 send_byte (int port_fd, char byte)
 {
-  int               ok;
-  ok = write (port_fd, &byte, 1);
+  int               send;
+  char              byte_s[2];
+
+  byte_s[0] = byte;
+  printf ("Sending '%s' ...", byte_s);
+  send = write (port_fd, &byte, 1);
+  if (send == 0)
+    {
+      printf ("error\n");
+      return 0;
+    }
+  printf ("ok\n");
   return 1;
 }
