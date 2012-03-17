@@ -55,14 +55,14 @@ main (int argc, char *argv[], char *env[])
 
   setup_port (port_fd);
   if (wait_byte (port_fd, '5', 1))
-    printf ("'5'\n");
+    return 1;
   send_byte (port_fd, 'A');
   if (wait_byte (port_fd, '5', 0))
-    printf ("'5'\n");
+    return 1;
   send_byte (port_fd, 'U');
   send_byte (port_fd, '3');
   if (wait_byte (port_fd, 'R', 0))
-    printf ("'R'\n");
+    return 1;
 
   return 0;
 }
