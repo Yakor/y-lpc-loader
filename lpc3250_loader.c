@@ -24,11 +24,11 @@
 int
 main (int argc, char *argv[], char *env[])
 {
-  int             i;
-  config_t        config;
-  char            conf_file_n[200];
-  wordexp_t       we;
-  int             port_fd;
+  int               i;
+  config_t          config;
+  char              conf_file_n[200];
+  wordexp_t         we;
+  int               port_fd;
 
 
   sprintf (conf_file_n, CONFIG_FILE_NAME);
@@ -70,7 +70,7 @@ main (int argc, char *argv[], char *env[])
 int
 setup_port (int port_fd)
 {
-  struct termios  tio;
+  struct termios    tio;
   tcgetattr (port_fd, &tio);
   cfsetispeed (&tio, B115200);
   cfsetospeed (&tio, B115200);
@@ -93,12 +93,12 @@ setup_port (int port_fd)
 int
 wait_byte (int port_fd, char byte, int skip)
 {
-  struct pollfd   poller;
-  int             bytes;
-  char            answer[2];
-  int             ok;
-  int             i;
-  int             wait_time;
+  struct pollfd     poller;
+  int               bytes;
+  char              answer[2];
+  int               ok;
+  int               i;
+  int               wait_time;
 
   wait_time = 100;
   if (skip)
@@ -144,7 +144,7 @@ wait_byte (int port_fd, char byte, int skip)
 int
 send_byte (int port_fd, char byte)
 {
-  int             ok;
+  int               ok;
   ok = write (port_fd, &byte, 1);
   return 1;
 }
