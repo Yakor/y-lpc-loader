@@ -18,7 +18,8 @@
 int
 read_config_yaml (char *file_name, config_t * config)
 {
-  int             i;
+  int               i;
+  unsigned long int tmp;
 
   config->executables = 0;
 
@@ -36,15 +37,17 @@ read_config_yaml (char *file_name, config_t * config)
                                                 MACRO_YAML_STRING (CONFIG_PRIMARY_FILENAME,
                                                                    config->executables[i].primary_filename);
                                                 MACRO_YAML_INT (CONFIG_IRAM_ADDRESS,
-                                                                config->executables[i].iram_address,
+                                                                tmp,
                                                                 {
+                                                                  config->executables[i].iram_address=tmp;
                                                                 }
                                                                 );
                                                 MACRO_YAML_STRING (CONFIG_SECONDARY_FILENAME,
                                                                    config->executables[i].secondary_filename);
                                                 MACRO_YAML_INT (CONFIG_SDRAM_ADDRESS,
-                                                                config->executables[i].sdram_address,
+                                                                tmp,
                                                                 {
+                                                                  config->executables[i].sdram_address=tmp;
                                                                 }
                                                                 );
                                               }

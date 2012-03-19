@@ -13,10 +13,10 @@ typedef struct
 {
   char              primary_filename[150];
   int               primary_size;
-  unsigned long int iram_address;
+  int               iram_address;
   char              secondary_filename[150];
   int               secondary_size;
-  unsigned long int sdram_address;
+  int               sdram_address;
 } executables_t;
 
 typedef struct

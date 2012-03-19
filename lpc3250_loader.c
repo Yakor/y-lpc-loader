@@ -1,3 +1,4 @@
+
 /**
  * @file   lpc3250_loader.c
  * @author  <yakor.spb@gmail.com>
@@ -18,6 +19,7 @@
 #include <sys/poll.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <errno.h>
 #include "read_config.h"
 #include "lpc3250_loader.h"
 
@@ -29,7 +31,6 @@ main (int argc, char *argv[], char *env[])
   char              conf_file_n[200];
   wordexp_t         we;
   int               port_fd;
-
 
   sprintf (conf_file_n, CONFIG_FILE_NAME);
   wordexp (conf_file_n, &we, 0);
@@ -54,14 +55,19 @@ main (int argc, char *argv[], char *env[])
   port_fd = open (config.port, O_RDWR | O_NOCTTY | O_NDELAY);
 
   setup_port (port_fd);
-  if (wait_byte (port_fd, '5', 1))
+  if (!wait_byte (port_fd, '5', 1))
     return 1;
   send_byte (port_fd, 'A');
-  if (wait_byte (port_fd, '5', 0))
+  if (!wait_byte (port_fd, '5', 0))
     return 1;
   send_byte (port_fd, 'U');
   send_byte (port_fd, '3');
-  if (wait_byte (port_fd, 'R', 0))
+  if (!wait_byte (port_fd, 'R', 0))
+    return 1;
+  send_4_bytes_reverse (port_fd, config.executables[0].iram_address);
+  send_file_to_port (port_fd, config.executables[0].primary_filename);
+
+  if (!wait_byte (port_fd, 'X', 0))
     return 1;
 
   return 0;
@@ -71,6 +77,7 @@ int
 setup_port (int port_fd)
 {
   struct termios    tio;
+
   tcgetattr (port_fd, &tio);
   cfsetispeed (&tio, B115200);
   cfsetospeed (&tio, B115200);
@@ -79,10 +86,7 @@ setup_port (int port_fd)
   tio.c_cflag &= ~CSIZE;
   tio.c_cflag |= CS8;
   tio.c_cflag &= ~CRTSCTS;
-  tio.c_iflag = IGNBRK;
-  tio.c_oflag = 0;
-  tio.c_lflag = 0;
-  tio.c_cc[VTIME] = 5;
+  tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 
   tcflush (port_fd, TCOFLUSH);
   tcflush (port_fd, TCIFLUSH);
@@ -101,13 +105,14 @@ wait_byte (int port_fd, char byte, int skip)
   int               wait_time;
   char              byte_s[2];
 
-  wait_time = 100;
+  wait_time = 1000;
   if (skip)
     wait_time = 10000;
 
   ok = 0;
   answer[1] = 0;
   byte_s[0] = byte;
+  byte_s[1] = 0;
   printf ("Waiting for '%s' ... ", byte_s);
   poller.fd = port_fd;
   poller.events = POLLIN;
@@ -116,7 +121,7 @@ wait_byte (int port_fd, char byte, int skip)
 
   if (ok == 0)
     {
-      printf ("error\n");
+      printf ("error poll\n");
       return 0;
     }
 
@@ -139,7 +144,7 @@ wait_byte (int port_fd, char byte, int skip)
 
   if (answer[0] != byte)
     {
-      printf ("error\n");
+      printf ("error answer\n");
       return 0;
     }
   printf ("ok\n");
@@ -153,6 +158,7 @@ send_byte (int port_fd, char byte)
   char              byte_s[2];
 
   byte_s[0] = byte;
+  byte_s[1] = 0;
   printf ("Sending '%s' ...", byte_s);
   send = write (port_fd, &byte, 1);
   if (send == 0)
@@ -161,5 +167,77 @@ send_byte (int port_fd, char byte)
       return 0;
     }
   printf ("ok\n");
+  return 1;
+}
+
+int
+send_4_bytes_reverse (int port_fd, int num)
+{
+  int               i;
+  int               tmp;
+  char              byte_to_send;
+
+  tmp = num;
+
+  for (i = 0; i < 4; i++)
+    {
+      byte_to_send = tmp & 0xff;
+      write (port_fd, &byte_to_send, 1);
+      tmp = tmp >> 8;
+    }
+
+  return 1;
+}
+
+int
+send_file_to_port (int port_fd, char *file_name)
+{
+  FILE             *f;
+  struct stat       stat_file;
+  char             *buf;
+  int               file_size;
+  int               i;
+  int               tmp;
+
+  printf ("Sending %s ", file_name);
+
+  f = fopen (file_name, "r");
+  fstat (fileno (f), &stat_file);
+  file_size = stat_file.st_size;
+  buf = malloc (file_size);
+  fread (buf, file_size, 1, f);
+
+  fclose (f);
+
+  send_4_bytes_reverse (port_fd, file_size);
+
+  tmp = 0;
+  i = 0;
+
+  while (file_size > 0 && tmp >= 0)
+    {
+      tmp = write (port_fd, &buf[i], file_size);
+      if (tmp < 0)
+	{
+	  if (errno == EAGAIN)
+	    {
+	      usleep (50000);
+	      tmp = 0;
+	    }
+	  else
+	    {
+	      printf ("error write to port\n");
+	      free (buf);
+	      return 0;
+	    }
+	}
+      i += tmp;
+      printf (".");
+      file_size -= tmp;
+    }
+
+  free (buf);
+  printf (" ok\n");
+
   return 1;
 }
