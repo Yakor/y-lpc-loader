@@ -64,11 +64,26 @@ main (int argc, char *argv[], char *env[])
   send_byte (port_fd, '3');
   if (!wait_byte (port_fd, 'R', 0))
     return 1;
-  send_4_bytes_reverse (port_fd, config.executables[0].iram_address);
-  send_file_to_port (port_fd, config.executables[0].primary_filename);
 
+  send_file_to_port (port_fd, config.executables[0].primary_filename,
+		     config.executables[0].iram_address, 0);
   if (!wait_byte (port_fd, 'X', 0))
     return 1;
+  send_byte (port_fd, 'p');
+  send_file_to_port (port_fd, config.executables[0].secondary_filename,
+		     config.executables[0].sdram_address, 'o');
+  if (!wait_byte (port_fd, 't', 0))
+    return 1;
+
+  char              answer[2];
+  answer[1] = 0;
+
+  while (1)
+    {
+      answer[0] = 0;
+      read (port_fd, answer, 1);
+      printf ("%s", answer);
+    }
 
   return 0;
 }
@@ -159,7 +174,7 @@ send_byte (int port_fd, char byte)
 
   byte_s[0] = byte;
   byte_s[1] = 0;
-  printf ("Sending '%s' ...", byte_s);
+  printf ("Sending '%s' ... ", byte_s);
   send = write (port_fd, &byte, 1);
   if (send == 0)
     {
@@ -190,7 +205,7 @@ send_4_bytes_reverse (int port_fd, int num)
 }
 
 int
-send_file_to_port (int port_fd, char *file_name)
+send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
 {
   FILE             *f;
   struct stat       stat_file;
@@ -198,22 +213,29 @@ send_file_to_port (int port_fd, char *file_name)
   int               file_size;
   int               i;
   int               tmp;
+  wordexp_t         we;
 
-  printf ("Sending %s ", file_name);
-
-  f = fopen (file_name, "r");
+  wordexp (file_name, &we, 0);
+  f = fopen (we.we_wordv[0], "r");
   fstat (fileno (f), &stat_file);
   file_size = stat_file.st_size;
   buf = malloc (file_size);
   fread (buf, file_size, 1, f);
-
   fclose (f);
 
+  send_4_bytes_reverse (port_fd, addr);
   send_4_bytes_reverse (port_fd, file_size);
+
+  if (confirm)
+    {
+      wait_byte (port_fd, confirm, 0);
+    }
 
   tmp = 0;
   i = 0;
 
+  printf ("Sending %s ", we.we_wordv[0]);
+  wordfree (&we);
   while (file_size > 0 && tmp >= 0)
     {
       tmp = write (port_fd, &buf[i], file_size);

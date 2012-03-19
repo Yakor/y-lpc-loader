@@ -11,11 +11,9 @@
 
 typedef struct
 {
-  char              primary_filename[150];
-  int               primary_size;
+  char              primary_filename[500];
   int               iram_address;
-  char              secondary_filename[150];
-  int               secondary_size;
+  char              secondary_filename[500];
   int               sdram_address;
 } executables_t;
 
