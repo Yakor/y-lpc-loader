@@ -59,29 +59,29 @@ main (int argc, char *argv[], char *env[])
   for (i = 0; i < config.qty_exec; i++)
     {
       if (!wait_byte (port_fd, '5', 1, 0))
-	return 1;
+        return 1;
       send_byte (port_fd, 'A');
       if (!wait_byte (port_fd, '5', 0, 0))
-	return 1;
+        return 1;
       send_byte (port_fd, 'U');
       send_byte (port_fd, '3');
       if (!wait_byte (port_fd, 'R', 0, 0))
-	return 1;
+        return 1;
 
-      send_file_to_port (port_fd, config.executables[0].primary_filename,
-			 config.executables[0].iram_address, 0);
+      send_file_to_port (port_fd, config.executables[i].primary_filename,
+                         config.executables[i].iram_address, 0);
       if (!wait_byte (port_fd, 'X', 0, 0))
-	return 1;
+        return 1;
       send_byte (port_fd, 'p');
-      send_file_to_port (port_fd, config.executables[0].secondary_filename,
-			 config.executables[0].sdram_address, 'o');
+      send_file_to_port (port_fd, config.executables[i].secondary_filename,
+                         config.executables[i].sdram_address, 'o');
       if (!wait_byte (port_fd, 't', 0, 0))
-	return 1;
+        return 1;
 
       while (!wait_byte (port_fd, '5', 0, 1))
-	{
-	  usleep (500000);
-	}
+        {
+          usleep (500000);
+        }
     }
 
   return 0;
@@ -138,7 +138,7 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
   if (ok == 0)
     {
       if (!prnt_char)
-	printf ("error poll\n");
+        printf ("error poll\n");
       return 0;
     }
 
@@ -148,7 +148,7 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
     {
       read (port_fd, answer, 1);
       if (prnt_char)
-	putchar (answer[0]);
+        putchar (answer[0]);
     }
 
   if ((answer[0] == byte) && skip)
@@ -156,17 +156,17 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
       usleep (500000);
       ioctl (port_fd, FIONREAD, &bytes);
       for (i = 0; i < bytes; i++)
-	{
-	  read (port_fd, answer, 1);
-	  if (prnt_char)
-	    putchar (answer[0]);
-	}
+        {
+          read (port_fd, answer, 1);
+          if (prnt_char)
+            putchar (answer[0]);
+        }
     }
 
   if (answer[0] != byte)
     {
       if (!prnt_char)
-	printf ("error answer\n");
+        printf ("error answer\n");
       return 0;
     }
   if (!prnt_char)
@@ -249,18 +249,18 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
       tmp = write (port_fd, &buf[i], file_size);
       usleep (50000);
       if (tmp < 0)
-	{
-	  if (errno == EAGAIN)
-	    {
-	      tmp = 0;
-	    }
-	  else
-	    {
-	      printf ("error write to port\n");
-	      free (buf);
-	      return 0;
-	    }
-	}
+        {
+          if (errno == EAGAIN)
+            {
+              tmp = 0;
+            }
+          else
+            {
+              printf ("error write to port\n");
+              free (buf);
+              return 0;
+            }
+        }
       i += tmp;
       printf (".");
       file_size -= tmp;
