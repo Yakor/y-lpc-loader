@@ -240,11 +240,11 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
   while (file_size > 0 && tmp >= 0)
     {
       tmp = write (port_fd, &buf[i], file_size);
+      usleep (50000);
       if (tmp < 0)
 	{
 	  if (errno == EAGAIN)
 	    {
-	      usleep (50000);
 	      tmp = 0;
 	    }
 	  else
