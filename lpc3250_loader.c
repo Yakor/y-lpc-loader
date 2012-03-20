@@ -101,6 +101,7 @@ setup_port (int port_fd)
   tio.c_cflag |= CS8;
   tio.c_cflag &= ~CRTSCTS;
   tio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+  tio.c_oflag &= ~OPOST;
 
   tcflush (port_fd, TCOFLUSH);
   tcflush (port_fd, TCIFLUSH);
