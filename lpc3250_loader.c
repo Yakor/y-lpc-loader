@@ -55,34 +55,33 @@ main (int argc, char *argv[], char *env[])
   port_fd = open (config.port, O_RDWR | O_NOCTTY | O_NDELAY);
 
   setup_port (port_fd);
-  if (!wait_byte (port_fd, '5', 1))
-    return 1;
-  send_byte (port_fd, 'A');
-  if (!wait_byte (port_fd, '5', 0))
-    return 1;
-  send_byte (port_fd, 'U');
-  send_byte (port_fd, '3');
-  if (!wait_byte (port_fd, 'R', 0))
-    return 1;
 
-  send_file_to_port (port_fd, config.executables[0].primary_filename,
-		     config.executables[0].iram_address, 0);
-  if (!wait_byte (port_fd, 'X', 0))
-    return 1;
-  send_byte (port_fd, 'p');
-  send_file_to_port (port_fd, config.executables[0].secondary_filename,
-		     config.executables[0].sdram_address, 'o');
-  if (!wait_byte (port_fd, 't', 0))
-    return 1;
-
-  char              answer[2];
-  answer[1] = 0;
-
-  while (1)
+  for (i = 0; i < config.qty_exec; i++)
     {
-      answer[0] = 0;
-      read (port_fd, answer, 1);
-      printf ("%s", answer);
+      if (!wait_byte (port_fd, '5', 1, 0))
+	return 1;
+      send_byte (port_fd, 'A');
+      if (!wait_byte (port_fd, '5', 0, 0))
+	return 1;
+      send_byte (port_fd, 'U');
+      send_byte (port_fd, '3');
+      if (!wait_byte (port_fd, 'R', 0, 0))
+	return 1;
+
+      send_file_to_port (port_fd, config.executables[0].primary_filename,
+			 config.executables[0].iram_address, 0);
+      if (!wait_byte (port_fd, 'X', 0, 0))
+	return 1;
+      send_byte (port_fd, 'p');
+      send_file_to_port (port_fd, config.executables[0].secondary_filename,
+			 config.executables[0].sdram_address, 'o');
+      if (!wait_byte (port_fd, 't', 0, 0))
+	return 1;
+
+      while (!wait_byte (port_fd, '5', 0, 1))
+	{
+	  usleep (500000);
+	}
     }
 
   return 0;
@@ -110,7 +109,7 @@ setup_port (int port_fd)
 }
 
 int
-wait_byte (int port_fd, char byte, int skip)
+wait_byte (int port_fd, char byte, int skip, int prnt_char)
 {
   struct pollfd     poller;
   int               bytes;
@@ -128,7 +127,8 @@ wait_byte (int port_fd, char byte, int skip)
   answer[1] = 0;
   byte_s[0] = byte;
   byte_s[1] = 0;
-  printf ("Waiting for '%s' ... ", byte_s);
+  if (!prnt_char)
+    printf ("Waiting for '%s' ... ", byte_s);
   poller.fd = port_fd;
   poller.events = POLLIN;
   poller.revents = 0;
@@ -136,7 +136,8 @@ wait_byte (int port_fd, char byte, int skip)
 
   if (ok == 0)
     {
-      printf ("error poll\n");
+      if (!prnt_char)
+	printf ("error poll\n");
       return 0;
     }
 
@@ -145,6 +146,8 @@ wait_byte (int port_fd, char byte, int skip)
   for (i = 0; i < bytes; i++)
     {
       read (port_fd, answer, 1);
+      if (prnt_char)
+	putchar (answer[0]);
     }
 
   if ((answer[0] == byte) && skip)
@@ -154,15 +157,19 @@ wait_byte (int port_fd, char byte, int skip)
       for (i = 0; i < bytes; i++)
 	{
 	  read (port_fd, answer, 1);
+	  if (prnt_char)
+	    putchar (answer[0]);
 	}
     }
 
   if (answer[0] != byte)
     {
-      printf ("error answer\n");
+      if (!prnt_char)
+	printf ("error answer\n");
       return 0;
     }
-  printf ("ok\n");
+  if (!prnt_char)
+    printf ("ok\n");
   return 1;
 }
 
@@ -228,7 +235,7 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
 
   if (confirm)
     {
-      wait_byte (port_fd, confirm, 0);
+      wait_byte (port_fd, confirm, 0, 0);
     }
 
   tmp = 0;
