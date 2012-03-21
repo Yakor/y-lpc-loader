@@ -1,1 +1,1 @@
-indent -gnu  -di18 -l100 -nut
+indent -gnu  -di18 -l100 -nut -sob
