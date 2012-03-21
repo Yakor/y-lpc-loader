@@ -20,6 +20,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <getopt.h>
 #include "read_config.h"
 #include "lpc3250_loader.h"
 
@@ -31,13 +32,42 @@ main (int argc, char *argv[], char *env[])
   char              conf_file_n[200];
   wordexp_t         we;
   int               port_fd;
+  int               opt = 0;
+  int               long_index = 0;
+
+  static const struct option long_opt[] = {
+    {"help", no_argument, NULL, 'h'},
+    {"config", required_argument, NULL, 'c'},
+    {NULL, no_argument, NULL, 0}
+  };
+  const char       *short_opt_s = "hc:";
+
+  printf ("lpc3250_loader\n");
+  opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
+  while (opt != -1)
+    {
+      switch (opt)
+        {
+        case 'h':
+          {
+            printf
+              ("Usage:\n -h (--help) this output\n -c (--config) file use alternate config file\n");
+            exit (1);
+            break;
+          }
+        case 'c':
+          {
+            break;
+          }
+        }
+      opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
+    }
 
   sprintf (conf_file_n, CONFIG_FILE_NAME);
   wordexp (conf_file_n, &we, 0);
   strcpy (conf_file_n, we.we_wordv[0]);
   wordfree (&we);
 
-  printf ("lpc3250_loader\n");
   printf ("Use config: %s\n\n", conf_file_n);
 
   read_config_yaml (conf_file_n, &config);
