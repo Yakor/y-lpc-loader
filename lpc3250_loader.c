@@ -29,7 +29,8 @@ main (int argc, char *argv[], char *env[])
 {
   int               i;
   config_t          config;
-  char              conf_file_n[200];
+  char              def_conf_file_n[] = CONFIG_FILE_NAME;
+  char             *conf_file_n = 0;
   wordexp_t         we;
   int               port_fd;
   int               opt = 0;
@@ -57,13 +58,16 @@ main (int argc, char *argv[], char *env[])
           }
         case 'c':
           {
+            conf_file_n = optarg;
             break;
           }
         }
       opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
     }
 
-  sprintf (conf_file_n, CONFIG_FILE_NAME);
+  if (!conf_file_n)
+    conf_file_n = def_conf_file_n;
+
   wordexp (conf_file_n, &we, 0);
   strcpy (conf_file_n, we.we_wordv[0]);
   wordfree (&we);
