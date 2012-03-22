@@ -40,7 +40,11 @@ main (int argc, char *argv[], char *env[])
   printf ("lpc3250_loader\n");
   printf ("Use config: %s\n\n", conf_file_n);
 
-  read_config_yaml (conf_file_n, &config);
+  if (!read_config_yaml (conf_file_n, &config))
+    {
+      printf ("error: config not readed\n");
+      return 1;
+    }
 
   printf ("Port: %s\n", config.port);
   for (i = 0; i < config.qty_exec; i++)
