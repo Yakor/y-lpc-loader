@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include "read_config.h"
-#include "lpc3250_loader.h"
+#include "y-lpc-loader.h"
 
 int
 main (int argc, char *argv[], char *env[])
@@ -43,7 +43,7 @@ main (int argc, char *argv[], char *env[])
   };
   const char       *short_opt_s = "hc:";
 
-  printf ("lpc3250_loader\n");
+  printf ("y-lpc-loader\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
   while (opt != -1)
     {
