@@ -22,10 +22,12 @@ read_config_yaml (char *file_name, config_t * config)
   unsigned long int tmp;
 
   config->executables = 0;
+  config->qty_exec = 0;
+  config->port = 0;
 
   MACRO_YAML_DOCUMENT (file_name,
 		       {
-                         MACRO_YAML_STRING (CONFIG_PORT, config->port);
+                         MACRO_YAML_STRING (CONFIG_PORT, config->port,{});
                          MACRO_YAML_SEQUENCE (CONFIG_EXECUTABLES, i,
                                               {
                                                 config->executables = realloc (config->executables, sizeof (executables_t) * (i + 1));
@@ -35,7 +37,9 @@ read_config_yaml (char *file_name, config_t * config)
                                               , config->qty_exec,
                                               {
                                                 MACRO_YAML_STRING (CONFIG_PRIMARY_FILENAME,
-                                                                   config->executables[i].primary_filename);
+                                                                   config->executables[i].primary_filename,
+                                                                   {}
+                                                                   );
                                                 MACRO_YAML_INT (CONFIG_IRAM_ADDRESS,
                                                                 tmp,
                                                                 {
@@ -43,7 +47,9 @@ read_config_yaml (char *file_name, config_t * config)
                                                                 }
                                                                 );
                                                 MACRO_YAML_STRING (CONFIG_SECONDARY_FILENAME,
-                                                                   config->executables[i].secondary_filename);
+                                                                   config->executables[i].secondary_filename,
+                                                                   {}
+                                                                   );
                                                 MACRO_YAML_INT (CONFIG_SDRAM_ADDRESS,
                                                                 tmp,
                                                                 {
@@ -61,6 +67,8 @@ read_config_yaml (char *file_name, config_t * config)
 void
 default_setting (executables_t * ex)
 {
-  ex->iram_address = 0x0000;
-  ex->sdram_address = 0x80000004;
+  ex->iram_address = DEFAULT_IRAM_ADDRESS;
+  ex->sdram_address = DEFAULT_SDRAM_ADDRESS;
+  ex->primary_filename = 0;
+  ex->secondary_filename = 0;
 }

@@ -15,14 +15,16 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#define MACRO_YAML_STRING(config_name,program_name)             \
-  if(!strcmp((char *)event.data.scalar.value,(config_name)))    \
-    {                                                           \
-      yaml_event_delete(&event);                                \
-      MACRO_YAML_NEXT;                                          \
-      if(event.type!=YAML_SCALAR_EVENT) return 0;               \
-      strcpy((program_name),(char *)event.data.scalar.value);   \
-      break;                                                    \
+#define MACRO_YAML_STRING(config_name,program_name,func)                \
+  if(!strcmp((char *)event.data.scalar.value,(config_name)))            \
+    {                                                                   \
+      yaml_event_delete(&event);                                        \
+      MACRO_YAML_NEXT;                                                  \
+      if(event.type!=YAML_SCALAR_EVENT) return 0;                       \
+      (program_name)=malloc(strlen((char*)event.data.scalar.value)+1);  \
+      strcpy((program_name),(char *)event.data.scalar.value);           \
+      (func);                                                           \
+      break;                                                            \
     }
 
 #define MACRO_YAML_NEXT                         \

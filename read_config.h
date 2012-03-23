@@ -7,19 +7,22 @@
 #define CONFIG_SDRAM_ADDRESS "SDRAMaddress"
 #define CONFIG_PORT "Port"
 #define CONFIG_EXECUTABLES "Exec"
-#define CONFIG_FILE_NAME "~/.lpc3250.yaml"
+#define DEFAULT_CONFIG_FILE_NAME "~/.lpc3250.yaml"
+#define DEFAULT_IRAM_ADDRESS 0x0000
+#define DEFAULT_SDRAM_ADDRESS 0x80000004
+#define DEFAULT_PORT "/dev/ttyS0"
 
 typedef struct
 {
-  char              primary_filename[500];
+  char             *primary_filename;
   int               iram_address;
-  char              secondary_filename[500];
+  char             *secondary_filename;
   int               sdram_address;
 } executables_t;
 
 typedef struct
 {
-  char              port[150];
+  char             *port;
   int               qty_exec;
   executables_t    *executables;
 } config_t;
