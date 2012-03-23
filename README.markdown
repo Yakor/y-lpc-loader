@@ -1,4 +1,4 @@
-# lpc3250 loader
+# Y LPC loader
 
 ## README
 
