@@ -29,19 +29,30 @@ main (int argc, char *argv[], char *env[])
 {
   int               i;
   config_t          config;
-  char              def_conf_file_n[] = CONFIG_FILE_NAME;
   char             *conf_file_n = 0;
   wordexp_t         we;
   int               port_fd;
   int               opt = 0;
   int               long_index = 0;
+  char             *primary_filename = 0;
+  char             *secondary_filename = 0;
+  char             *port = 0;
+  int               iram_address = -1;
+  int               sdram_address = -1;
+  int               conf_ok = 0;
+  executables_t    *ex;
 
   static const struct option long_opt[] = {
     {"help", no_argument, NULL, 'h'},
     {"config", required_argument, NULL, 'c'},
+    {"first", required_argument, NULL, 'f'},
+    {"second", required_argument, NULL, 's'},
+    {"primary-address", required_argument, NULL, 'i'},
+    {"secondary-address", required_argument, NULL, 'd'},
+    {"port", required_argument, NULL, 'p'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:";
+  const char       *short_opt_s = "hc:p:s:i:d:f:";
 
   printf ("y-lpc-loader\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
@@ -51,8 +62,7 @@ main (int argc, char *argv[], char *env[])
         {
         case 'h':
           {
-            printf
-              ("Usage:\n -h (--help) this output\n -c (--config) file use alternate config file\n");
+            printf (HELP_STRING);
             exit (1);
             break;
           }
@@ -61,33 +71,92 @@ main (int argc, char *argv[], char *env[])
             conf_file_n = optarg;
             break;
           }
+        case 'f':
+          {
+            primary_filename = optarg;
+            break;
+          }
+        case 's':
+          {
+            secondary_filename = optarg;
+            break;
+          }
+        case 'i':
+          {
+            iram_address = strtol ((char *) optarg, NULL, 0);
+            break;
+          }
+        case 'd':
+          {
+            sdram_address = strtol ((char *) optarg, NULL, 0);
+            break;
+          }
+        case 'p':
+          {
+            port = optarg;
+            break;
+          }
         }
       opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
     }
 
   if (!conf_file_n)
-    conf_file_n = def_conf_file_n;
+    create_str (&conf_file_n, DEFAULT_CONFIG_FILE_NAME);
 
   wordexp (conf_file_n, &we, 0);
-  strcpy (conf_file_n, we.we_wordv[0]);
+  create_str (&conf_file_n, we.we_wordv[0]);
   wordfree (&we);
 
-  printf ("Use config: %s\n\n", conf_file_n);
+  printf ("Use config: %s\nReading config ... ", conf_file_n);
 
   if (!read_config_yaml (conf_file_n, &config))
     {
-      printf ("error: config not readed\n");
-      return 1;
+      printf ("error\n");
+    }
+  else
+    {
+      printf ("ok\n");
+      conf_ok = 1;
     }
 
-  printf ("Port: %s\n", config.port);
+  if (port)
+    {
+      config.port = port;
+    }
+
+  if (!config.port)
+    {
+      create_str (&config.port, DEFAULT_PORT);
+      printf ("Port not specified. Use default\n");
+    }
+
+  if (primary_filename)
+    {
+      printf ("Found manualy specified first execurable file\nExecutables from config ignored\n");
+      config.qty_exec = 1;
+      free (config.executables);
+      config.executables = malloc (sizeof (config_t));
+      default_setting (config.executables);
+      config.executables[0].primary_filename = primary_filename;
+      if (iram_address != -1)
+        config.executables[0].iram_address = iram_address;
+      if (secondary_filename)
+        config.executables[0].secondary_filename = secondary_filename;
+      if (sdram_address != -1)
+        config.executables[0].sdram_address = sdram_address;
+    }
+
+  printf ("\nPort: %s\n", config.port);
   for (i = 0; i < config.qty_exec; i++)
     {
       printf ("i: %i\n", i);
       printf ("PrimaryFileName: %s\n", config.executables[i].primary_filename);
       printf ("IRAMaddress: %x\n", config.executables[i].iram_address);
-      printf ("SecondaryFileName: %s\n", config.executables[i].secondary_filename);
-      printf ("SDRAMaddress: %x\n", config.executables[i].sdram_address);
+      if (config.executables[i].secondary_filename)
+        {
+          printf ("SecondaryFileName: %s\n", config.executables[i].secondary_filename);
+          printf ("SDRAMaddress: %x\n", config.executables[i].sdram_address);
+        }
     }
   printf ("\n");
   port_fd = open (config.port, O_RDWR | O_NOCTTY | O_NDELAY);
@@ -96,6 +165,8 @@ main (int argc, char *argv[], char *env[])
 
   for (i = 0; i < config.qty_exec; i++)
     {
+      ex = &config.executables[i];
+
       if (!wait_byte (port_fd, '5', 1, 0))
         return 1;
       send_byte (port_fd, 'A');
@@ -106,15 +177,19 @@ main (int argc, char *argv[], char *env[])
       if (!wait_byte (port_fd, 'R', 0, 0))
         return 1;
 
-      send_file_to_port (port_fd, config.executables[i].primary_filename,
-                         config.executables[i].iram_address, 0);
-      if (!wait_byte (port_fd, 'X', 0, 0))
+      if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0))
         return 1;
-      send_byte (port_fd, 'p');
-      send_file_to_port (port_fd, config.executables[i].secondary_filename,
-                         config.executables[i].sdram_address, 'o');
-      if (!wait_byte (port_fd, 't', 0, 0))
-        return 1;
+
+      if (ex->secondary_filename)
+        {
+          if (!wait_byte (port_fd, 'X', 0, 0))
+            return 1;
+          send_byte (port_fd, 'p');
+          if (!send_file_to_port (port_fd, ex->secondary_filename, ex->sdram_address, 'o'))
+            return 1;
+          if (!wait_byte (port_fd, 't', 0, 0))
+            return 1;
+        }
 
       while (!wait_byte (port_fd, '5', 0, 1))
         {
@@ -263,6 +338,11 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
 
   wordexp (file_name, &we, 0);
   f = fopen (we.we_wordv[0], "r");
+  if (!f)
+    {
+      printf ("Error opening %s\n", file_name);
+      return 0;
+    }
   fstat (fileno (f), &stat_file);
   file_size = stat_file.st_size;
   buf = malloc (file_size);
@@ -306,6 +386,19 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
 
   free (buf);
   printf (" ok\n");
+
+  return 1;
+}
+
+int
+create_str (char **dest, const char *source)
+{
+  int               len;
+
+  free (*dest);
+  len = strlen (source);
+  *dest = malloc (len + 1);
+  strncpy (*dest, source, len);
 
   return 1;
 }
