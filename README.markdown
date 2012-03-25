@@ -10,6 +10,11 @@ Yet another lpc3250 loader
 * Can be configured in comand line
 * Load sequence of executables
 
+### Dependencies ###
+
+    >cmake-2.6
+    libyaml
+
 ### Compiling ###
 
     mkdir build
@@ -44,9 +49,7 @@ Example
 * SecondaryFileName - Secondary executable
 * SDRAMaddress - SDRAM address
 
-1. load `erase_nand.bin` on default IRAM address and executet
-2. load `burner_kickstart.bin` on default IRAM address, then load `kickstart.bin` on default SDRAM address
-3. load `burner_s1app.bin` on 0x0000 then load `s1l_from_kick.bin` on 0x80000004
+Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address, then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000 then load `s1l_from_kick.bin` on 0x80000004
 
 Config can have difference exeks count.
 
@@ -55,9 +58,11 @@ Config can have difference exeks count.
     -h, --help               help
     -c, --config             file use alternate config file
     -p, --port               port
-    -f, --first              first execurable file
+    -f, --first              primary execurable file
     -s, --second             secondary execurable file
     -i, --primary-address    primary file load address
     -d, --secondary-address  secondary file load address
+
+Comand line options have greater priority vs config file options. If specified `primary execurable file` sequence of execs in config would ignored.
 
 ### Using ###
