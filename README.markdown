@@ -63,6 +63,8 @@ Config can have difference exeks count.
     -i, --primary-address    primary file load address
     -d, --secondary-address  secondary file load address
 
-Comand line options have greater priority vs config file options. If specified `primary execurable file` sequence of execs in config would ignored.
+Comand line options have greater priority vs config file options. If specified `primary execurable file` sequence of execs in config would be ignored.
 
 ### Using ###
+
+Start y-lpc-loader, reset board. Wait for execs or burning. For start next exec reset board twice
