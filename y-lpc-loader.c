@@ -169,11 +169,11 @@ main (int argc, char *argv[], char *env[])
 
       if (!wait_byte (port_fd, '5', 1, 0))
         return 1;
-      send_byte (port_fd, 'A');
+      send_byte (port_fd, 'A', 0);
       if (!wait_byte (port_fd, '5', 0, 0))
         return 1;
-      send_byte (port_fd, 'U');
-      send_byte (port_fd, '3');
+      send_byte (port_fd, 'U', 0);
+      send_byte (port_fd, '3', 0);
       if (!wait_byte (port_fd, 'R', 0, 0))
         return 1;
 
@@ -184,7 +184,7 @@ main (int argc, char *argv[], char *env[])
         {
           if (!wait_byte (port_fd, 'X', 0, 0))
             return 1;
-          send_byte (port_fd, 'p');
+          send_byte (port_fd, 'p', 0);
           if (!send_file_to_port (port_fd, ex->secondary_filename, ex->sdram_address, 'o'))
             return 1;
           if (!wait_byte (port_fd, 't', 0, 0))
@@ -288,21 +288,26 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
 }
 
 int
-send_byte (int port_fd, char byte)
+send_byte (int port_fd, char byte, int prnt_char)
 {
   int               send;
   char              byte_s[2];
 
   byte_s[0] = byte;
   byte_s[1] = 0;
-  printf ("Sending '%s' ... ", byte_s);
+  if (!prnt_char)
+    printf ("Sending '%s' ... ", byte_s);
   send = write (port_fd, &byte, 1);
   if (send == 0)
     {
-      printf ("error\n");
+      if (!prnt_char)
+        printf ("error\n");
       return 0;
     }
-  printf ("ok\n");
+  if (!prnt_char)
+    printf ("ok\n");
+  else
+    putchar (byte);
   return 1;
 }
 
