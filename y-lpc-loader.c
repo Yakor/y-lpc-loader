@@ -40,6 +40,7 @@ main (int argc, char *argv[], char *env[])
   int               iram_address = -1;
   int               sdram_address = -1;
   int               conf_ok = 0;
+  int               prnt_char = 0;
   executables_t    *ex;
 
   static const struct option long_opt[] = {
@@ -50,9 +51,10 @@ main (int argc, char *argv[], char *env[])
     {"primary-address", required_argument, NULL, 'i'},
     {"secondary-address", required_argument, NULL, 'd'},
     {"port", required_argument, NULL, 'p'},
+    {"output_char", no_argument, NULL, 'o'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:p:s:i:d:f:";
+  const char       *short_opt_s = "hc:p:s:i:d:f:o";
 
   printf ("y-lpc-loader\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
@@ -94,6 +96,11 @@ main (int argc, char *argv[], char *env[])
         case 'p':
           {
             port = optarg;
+            break;
+          }
+        case 'o':
+          {
+            prnt_char = 1;
             break;
           }
         }
@@ -167,14 +174,14 @@ main (int argc, char *argv[], char *env[])
     {
       ex = &config.executables[i];
 
-      if (!wait_byte (port_fd, '5', 1, 0))
+      if (!wait_byte (port_fd, '5', 1, prnt_char))
         return 1;
-      send_byte (port_fd, 'A', 0);
-      if (!wait_byte (port_fd, '5', 0, 0))
+      send_byte (port_fd, 'A', prnt_char);
+      if (!wait_byte (port_fd, '5', 0, prnt_char))
         return 1;
-      send_byte (port_fd, 'U', 0);
-      send_byte (port_fd, '3', 0);
-      if (!wait_byte (port_fd, 'R', 0, 0))
+      send_byte (port_fd, 'U', prnt_char);
+      send_byte (port_fd, '3', prnt_char);
+      if (!wait_byte (port_fd, 'R', 0, prnt_char))
         return 1;
 
       if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0))
@@ -182,12 +189,12 @@ main (int argc, char *argv[], char *env[])
 
       if (ex->secondary_filename)
         {
-          if (!wait_byte (port_fd, 'X', 0, 0))
+          if (!wait_byte (port_fd, 'X', 0, prnt_char))
             return 1;
-          send_byte (port_fd, 'p', 0);
+          send_byte (port_fd, 'p', prnt_char);
           if (!send_file_to_port (port_fd, ex->secondary_filename, ex->sdram_address, 'o'))
             return 1;
-          if (!wait_byte (port_fd, 't', 0, 0))
+          if (!wait_byte (port_fd, 't', 0, prnt_char))
             return 1;
         }
 
