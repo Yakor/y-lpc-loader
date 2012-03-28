@@ -184,7 +184,7 @@ main (int argc, char *argv[], char *env[])
       if (!wait_byte (port_fd, 'R', 0, prnt_char))
         return 1;
 
-      if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0))
+      if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0, prnt_char))
         return 1;
 
       if (ex->secondary_filename)
@@ -192,7 +192,8 @@ main (int argc, char *argv[], char *env[])
           if (!wait_byte (port_fd, 'X', 0, prnt_char))
             return 1;
           send_byte (port_fd, 'p', prnt_char);
-          if (!send_file_to_port (port_fd, ex->secondary_filename, ex->sdram_address, 'o'))
+          if (!send_file_to_port
+              (port_fd, ex->secondary_filename, ex->sdram_address, 'o', prnt_char))
             return 1;
           if (!wait_byte (port_fd, 't', 0, prnt_char))
             return 1;
@@ -338,7 +339,7 @@ send_4_bytes_reverse (int port_fd, int num)
 }
 
 int
-send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
+send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prnt_char)
 {
   FILE             *f;
   struct stat       stat_file;
@@ -366,13 +367,13 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
 
   if (confirm)
     {
-      wait_byte (port_fd, confirm, 0, 0);
+      wait_byte (port_fd, confirm, 0, prnt_char);
     }
 
   tmp = 0;
   i = 0;
-
-  printf ("Sending %s ", we.we_wordv[0]);
+  if (!prnt_char)
+    printf ("Sending %s ", we.we_wordv[0]);
   wordfree (&we);
   while (file_size > 0 && tmp >= 0)
     {
@@ -392,12 +393,14 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm)
             }
         }
       i += tmp;
-      printf (".");
+      if (!prnt_char)
+        printf (".");
       file_size -= tmp;
     }
 
   free (buf);
-  printf (" ok\n");
+  if (!prnt_char)
+    printf (" ok\n");
 
   return 1;
 }
