@@ -30,6 +30,7 @@ main (int argc, char *argv[], char *env[])
   int               i;
   config_t          config;
   char             *conf_file_n = 0;
+  char             *conf_file_option = 0;
   wordexp_t         we;
   int               port_fd;
   int               opt = 0;
@@ -70,7 +71,7 @@ main (int argc, char *argv[], char *env[])
           }
         case 'c':
           {
-            conf_file_n = optarg;
+            conf_file_option = optarg;
             break;
           }
         case 'f':
@@ -107,8 +108,10 @@ main (int argc, char *argv[], char *env[])
       opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
     }
 
-  if (!conf_file_n)
+  if (!conf_file_option)
     create_str (&conf_file_n, DEFAULT_CONFIG_FILE_NAME);
+  else
+    create_str (&conf_file_n, conf_file_option);
 
   wordexp (conf_file_n, &we, 0);
   create_str (&conf_file_n, we.we_wordv[0]);
