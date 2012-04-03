@@ -52,10 +52,10 @@ main (int argc, char *argv[], char *env[])
     {"primary-address", required_argument, NULL, 'i'},
     {"secondary-address", required_argument, NULL, 'd'},
     {"port", required_argument, NULL, 'p'},
-    {"output_char", no_argument, NULL, 'o'},
+    {"print-all-char", no_argument, NULL, 'a'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:p:s:i:d:f:o";
+  const char       *short_opt_s = "hc:p:s:i:d:f:a";
 
   printf ("y-lpc-loader\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
@@ -99,7 +99,7 @@ main (int argc, char *argv[], char *env[])
             port = optarg;
             break;
           }
-        case 'o':
+        case 'a':
           {
             prnt_all_char = 1;
             break;
