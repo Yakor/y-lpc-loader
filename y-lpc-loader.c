@@ -117,7 +117,7 @@ main (int argc, char *argv[], char *env[])
   create_str (&conf_file_n, we.we_wordv[0]);
   wordfree (&we);
 
-  printf ("Use config: %s\nReading config ... ", conf_file_n);
+  printf ("Using config: %s\nReading config ... ", conf_file_n);
 
   if (!read_config_yaml (conf_file_n, &config))
     {
@@ -161,13 +161,13 @@ main (int argc, char *argv[], char *env[])
   printf ("\nPort: %s\n", config.port);
   for (i = 0; i < config.qty_exec; i++)
     {
-      printf ("i: %i\n", i);
-      printf ("PrimaryFileName: %s\n", config.executables[i].primary_filename);
-      printf ("IRAMaddress: %x\n", config.executables[i].iram_address);
+      printf ("%i\n", i + 1);
+      printf ("   PrimaryFileName: %s\n", config.executables[i].primary_filename);
+      printf ("   IRAMaddress: %x\n", config.executables[i].iram_address);
       if (config.executables[i].secondary_filename)
         {
-          printf ("SecondaryFileName: %s\n", config.executables[i].secondary_filename);
-          printf ("SDRAMaddress: %x\n", config.executables[i].sdram_address);
+          printf ("   SecondaryFileName: %s\n", config.executables[i].secondary_filename);
+          printf ("   SDRAMaddress: %x\n", config.executables[i].sdram_address);
         }
     }
   printf ("\n");
