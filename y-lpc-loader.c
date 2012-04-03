@@ -159,6 +159,7 @@ main (int argc, char *argv[], char *env[])
     }
 
   printf ("\nPort: %s\n", config.port);
+  printf ("PrintAllChar: %i\n", prnt_all_char);
   for (i = 0; i < config.qty_exec; i++)
     {
       printf ("%i\n", i + 1);
