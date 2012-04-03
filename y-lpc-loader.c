@@ -41,7 +41,7 @@ main (int argc, char *argv[], char *env[])
   int               iram_address = -1;
   int               sdram_address = -1;
   int               conf_ok = 0;
-  int               prnt_char = 0;
+  int               prnt_all_char = 0;
   executables_t    *ex;
 
   static const struct option long_opt[] = {
@@ -52,10 +52,10 @@ main (int argc, char *argv[], char *env[])
     {"primary-address", required_argument, NULL, 'i'},
     {"secondary-address", required_argument, NULL, 'd'},
     {"port", required_argument, NULL, 'p'},
-    {"output_char", no_argument, NULL, 'o'},
+    {"print-all-char", no_argument, NULL, 'a'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:p:s:i:d:f:o";
+  const char       *short_opt_s = "hc:p:s:i:d:f:a";
 
   printf ("y-lpc-loader\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
@@ -99,9 +99,9 @@ main (int argc, char *argv[], char *env[])
             port = optarg;
             break;
           }
-        case 'o':
+        case 'a':
           {
-            prnt_char = 1;
+            prnt_all_char = 1;
             break;
           }
         }
@@ -128,6 +128,8 @@ main (int argc, char *argv[], char *env[])
       printf ("ok\n");
       conf_ok = 1;
     }
+
+  prnt_all_char |= config.prnt_all_char;
 
   if (port)
     {
@@ -177,35 +179,36 @@ main (int argc, char *argv[], char *env[])
     {
       ex = &config.executables[i];
 
-      if (!wait_byte (port_fd, '5', 1, prnt_char))
+      if (!wait_byte (port_fd, '5', 1, prnt_all_char, 0))
         return 1;
-      send_byte (port_fd, 'A', prnt_char);
-      if (!wait_byte (port_fd, '5', 0, prnt_char))
+      send_byte (port_fd, 'A', prnt_all_char);
+      if (!wait_byte (port_fd, '5', 0, prnt_all_char, 0))
         return 1;
-      send_byte (port_fd, 'U', prnt_char);
-      send_byte (port_fd, '3', prnt_char);
-      if (!wait_byte (port_fd, 'R', 0, prnt_char))
+      send_byte (port_fd, 'U', prnt_all_char);
+      send_byte (port_fd, '3', prnt_all_char);
+      if (!wait_byte (port_fd, 'R', 0, prnt_all_char, 0))
         return 1;
 
-      if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0, prnt_char))
+      if (!send_file_to_port (port_fd, ex->primary_filename, ex->iram_address, 0, prnt_all_char))
         return 1;
 
       if (ex->secondary_filename)
         {
-          if (!wait_byte (port_fd, 'X', 0, prnt_char))
+          if (!wait_byte (port_fd, 'X', 0, prnt_all_char, 0))
             return 1;
-          send_byte (port_fd, 'p', prnt_char);
+          send_byte (port_fd, 'p', prnt_all_char);
           if (!send_file_to_port
-              (port_fd, ex->secondary_filename, ex->sdram_address, 'o', prnt_char))
+              (port_fd, ex->secondary_filename, ex->sdram_address, 'o', prnt_all_char))
             return 1;
-          if (!wait_byte (port_fd, 't', 0, prnt_char))
+          if (!wait_byte (port_fd, 't', 0, prnt_all_char, 0))
             return 1;
         }
 
-      while (!wait_byte (port_fd, '5', 0, 1))
+      while (!wait_byte (port_fd, '5', 0, 1, 1))
         {
           usleep (500000);
         }
+      printf ("\n");
     }
 
   return 0;
@@ -234,7 +237,7 @@ setup_port (int port_fd)
 }
 
 int
-wait_byte (int port_fd, char byte, int skip, int prnt_char)
+wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
 {
   struct pollfd     poller;
   int               bytes;
@@ -252,7 +255,7 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
   answer[1] = 0;
   byte_s[0] = byte;
   byte_s[1] = 0;
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf ("Waiting for '%s' ... ", byte_s);
   poller.fd = port_fd;
   poller.events = POLLIN;
@@ -261,18 +264,26 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
 
   if (ok == 0)
     {
-      if (!prnt_char)
+      if (!prnt_all_char)
         printf ("error poll\n");
       return 0;
     }
 
   ioctl (port_fd, FIONREAD, &bytes);
 
+  if (!skip && !pure_output)
+    bytes = 1;
+
   for (i = 0; i < bytes; i++)
     {
       read (port_fd, answer, 1);
-      if (prnt_char)
-        putchar (answer[0]);
+      if (prnt_all_char)
+        {
+          if (pure_output)
+            printf ("%s", answer);
+          else
+            printf ("< %s\n", answer);
+        }
     }
 
   if ((answer[0] == byte) && skip)
@@ -282,43 +293,46 @@ wait_byte (int port_fd, char byte, int skip, int prnt_char)
       for (i = 0; i < bytes; i++)
         {
           read (port_fd, answer, 1);
-          if (prnt_char)
-            putchar (answer[0]);
+          if (pure_output)
+            printf ("%s", answer);
+          else
+            printf ("< %s\n", answer);
         }
     }
 
   if (answer[0] != byte)
     {
-      if (!prnt_char)
+      if (!prnt_all_char)
         printf ("error answer\n");
       return 0;
     }
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf ("ok\n");
   return 1;
 }
 
 int
-send_byte (int port_fd, char byte, int prnt_char)
+send_byte (int port_fd, char byte, int prnt_all_char)
 {
   int               send;
   char              byte_s[2];
 
   byte_s[0] = byte;
   byte_s[1] = 0;
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf ("Sending '%s' ... ", byte_s);
   send = write (port_fd, &byte, 1);
   if (send == 0)
     {
-      if (!prnt_char)
+      if (!prnt_all_char)
         printf ("error\n");
       return 0;
     }
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf ("ok\n");
   else
-    putchar (byte);
+    printf ("> %s\n", byte_s);
+
   return 1;
 }
 
@@ -342,7 +356,7 @@ send_4_bytes_reverse (int port_fd, int num)
 }
 
 int
-send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prnt_char)
+send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prnt_all_char)
 {
   FILE             *f;
   struct stat       stat_file;
@@ -370,13 +384,15 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
 
   if (confirm)
     {
-      wait_byte (port_fd, confirm, 0, prnt_char);
+      wait_byte (port_fd, confirm, 0, prnt_all_char, 0);
     }
 
   tmp = 0;
   i = 0;
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf ("Sending %s ", we.we_wordv[0]);
+  else
+    printf ("> {%s}\n", we.we_wordv[0]);
   wordfree (&we);
   while (file_size > 0 && tmp >= 0)
     {
@@ -396,13 +412,13 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
             }
         }
       i += tmp;
-      if (!prnt_char)
+      if (!prnt_all_char)
         printf (".");
       file_size -= tmp;
     }
 
   free (buf);
-  if (!prnt_char)
+  if (!prnt_all_char)
     printf (" ok\n");
 
   return 1;
