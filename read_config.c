@@ -24,10 +24,17 @@ read_config_yaml (char *file_name, config_t * config)
   config->executables = 0;
   config->qty_exec = 0;
   config->port = 0;
+  config->prnt_all_char=0;
 
   MACRO_YAML_DOCUMENT (file_name,
 		       {
                          MACRO_YAML_STRING (CONFIG_PORT, config->port,{});
+                         MACRO_YAML_INT (CONFIG_PRINT_ALL_CHAR,
+                                         tmp,
+                                         {
+                                           config->prnt_all_char=tmp;
+                                         }
+                                         );
                          MACRO_YAML_SEQUENCE (CONFIG_EXECUTABLES, i,
                                               {
                                                 config->executables = realloc (config->executables, sizeof (executables_t) * (i + 1));

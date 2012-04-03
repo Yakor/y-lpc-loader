@@ -6,6 +6,7 @@
 #define CONFIG_SECONDARY_FILENAME "SecondaryFileName"
 #define CONFIG_SDRAM_ADDRESS "SDRAMaddress"
 #define CONFIG_PORT "Port"
+#define CONFIG_PRINT_ALL_CHAR "PrintAllChar"
 #define CONFIG_EXECUTABLES "Exec"
 #define DEFAULT_CONFIG_FILE_NAME "~/.lpc3250.yaml"
 #define DEFAULT_IRAM_ADDRESS 0x0000
@@ -23,6 +24,7 @@ typedef struct
 typedef struct
 {
   char             *port;
+  int               prnt_all_char;
   int               qty_exec;
   executables_t    *executables;
 } config_t;
