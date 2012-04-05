@@ -293,11 +293,14 @@ wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
       ioctl (port_fd, FIONREAD, &bytes);
       for (i = 0; i < bytes; i++)
         {
-          read (port_fd, answer, 1);
-          if (pure_output)
-            printf ("%s", answer);
-          else
-            printf ("< %s\n", answer);
+          if (prnt_all_char)
+            {
+              read (port_fd, answer, 1);
+              if (pure_output)
+                printf ("%s", answer);
+              else
+                printf ("< %s\n", answer);
+            }
         }
     }
 
