@@ -1,8 +1,6 @@
 
 /**
- * @file   lpc3250_loader.c
- * @author  <yakor.spb@gmail.com>
- * @date   Thu Mar 15 19:27:35 2012
+ * @file   y-lpc-loader.c
  *
  * @brief lpc3250 loader
  *
@@ -481,11 +479,12 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
 }
 
 /**
- * Create string from source. Dangerous function.
+ * Create string from source.
  *
  * @param dest output string
  * @param source input string
  *
+ * @warning Dangerous!
  * @return 1 if succesfully otherwise 0
  */
 

@@ -1,12 +1,8 @@
 /**
- * @file   ReadConfig.c
- * @author  <yakor@Lenovo.net.home>
- * @date   Tue Sep 28 01:49:46 2010
+ * @file   yaml_macro.h
  *
- * @brief  Читает конфиги
+ * @brief  macros for read yaml config
  *
- * @todo  Сделать проверки на правильность конфигов чтоб никогда не падала
- * Все временные malloc закончить free
  */
 
 #include <yaml.h>
