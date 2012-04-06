@@ -1,0 +1,11 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#define Y_LPC_LOADER_NAME "y-lpc-loader"
+#define Y_LPC_LOADER_VERSION "@y-lpc-loader_VERSION@"
+#define Y_LPC_LOADER_FULL_NAME "y-lpc-loader version @y-lpc-loader_VERSION@"
+#define Y_LPC_LOADER_MAJOR_VERSION @y-lpc-loader_MAJOR_VERSION@
+#define Y_LPC_LOADER_MINOR_VERSION @y-lpc-loader_MINOR_VERSION@
+#define Y_LPC_LOADER_PATCH_LEVEL @y-lpc-loader_PATCH_LEVEL@
+
+#endif /* VERSION_H */

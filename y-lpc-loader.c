@@ -23,6 +23,7 @@
 #include <getopt.h>
 #include "read_config.h"
 #include "y-lpc-loader.h"
+#include "version.h"
 
 int
 main (int argc, char *argv[], char *env[])
@@ -57,7 +58,7 @@ main (int argc, char *argv[], char *env[])
   };
   const char       *short_opt_s = "hc:p:s:i:d:f:a";
 
-  printf ("y-lpc-loader\n");
+  printf (Y_LPC_LOADER_FULL_NAME "\n\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
   while (opt != -1)
     {
