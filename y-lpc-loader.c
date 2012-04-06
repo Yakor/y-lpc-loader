@@ -216,6 +216,14 @@ main (int argc, char *argv[], char *env[])
   return 0;
 }
 
+/**
+ * Seting ip serial port
+ *
+ * @param port_fd port file descriptor
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 setup_port (int port_fd)
 {
@@ -237,6 +245,18 @@ setup_port (int port_fd)
   tcsetattr (port_fd, TCIFLUSH, &tio);
   return 1;
 }
+
+/**
+ * waiting for byte specified byte
+ *
+ * @param port_fd port file descriptor
+ * @param byte byte for wait
+ * @param skip if 1 skip not matched bytes
+ * @param prnt_all_char if 1 print all char incoming
+ * @param pure_output if 1 pure output without helper messages
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
@@ -316,6 +336,16 @@ wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
   return 1;
 }
 
+/**
+ * Sending specified byte to port
+ *
+ * @param port_fd port file descriptor
+ * @param byte byte to sent
+ * @param prnt_all_char switch info messages type
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 send_byte (int port_fd, char byte, int prnt_all_char)
 {
@@ -341,6 +371,15 @@ send_byte (int port_fd, char byte, int prnt_all_char)
   return 1;
 }
 
+/**
+ * send to port 32 bits. Least significant byte first
+ *
+ * @param port_fd port file descriptor
+ * @param num int to send
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 send_4_bytes_reverse (int port_fd, int num)
 {
@@ -359,6 +398,18 @@ send_4_bytes_reverse (int port_fd, int num)
 
   return 1;
 }
+
+/**
+ * Send specified file to port
+ *
+ * @param port_fd port file descriptor
+ * @param file_name file to send
+ * @param addr start address
+ * @param confirm confirm char, if == 0 file transfered without confirm
+ * @param prnt_all_char swith info messages type
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prnt_all_char)
@@ -428,6 +479,15 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
 
   return 1;
 }
+
+/**
+ * Create string from source. Dangerous function.
+ *
+ * @param dest output string
+ * @param source input string
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 create_str (char **dest, const char *source)
