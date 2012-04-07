@@ -1,7 +1,9 @@
 /**
  * @file   read_config.c
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
  *
  * @brief  Read config
+ *
  *
  */
 

@@ -1,7 +1,9 @@
 /**
  * @file   yaml_macro.h
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
  *
  * @brief  macros for read yaml config
+ *
  *
  */
 

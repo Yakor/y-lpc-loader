@@ -1,11 +1,12 @@
-
 /**
  * @file   y-lpc-loader.c
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
  *
- * @brief lpc3250 loader
+ * @brief  lpc32xx loader
  *
  *
  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
