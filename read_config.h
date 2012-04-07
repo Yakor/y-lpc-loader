@@ -15,18 +15,18 @@
 
 typedef struct
 {
-  char             *primary_filename; /**< first executable file name */
-  int               iram_address; /**< start address of first executable */
-  char             *secondary_filename; /**< second executable file name */
-  int               sdram_address; /**< start address of second executable */
+  char             *primary_filename;        /**< start address of first executable */
+  int               iram_address;            /**< start address of first executable */
+  char             *secondary_filename;      /**< second executable file name */
+  int               sdram_address;           /**< start address of second executable */
 } executables_t;
 
 typedef struct
 {
-  char             *port;       /**< port */
-  int               prnt_all_char; /**< if 1 print all incoming char */
-  int               qty_exec;   /**< qty of first execs */
-  executables_t    *executables; /**< pointer to array of executables */
+  char             *port;                    /**< port */
+  int               prnt_all_char;           /**< if 1 print all incoming char */
+  int               qty_exec;                /**< qty of first execs */
+  executables_t    *executables;             /**< pointer to array of executables */
 } config_t;
 
 int               read_config_yaml (char *file_name, config_t * config);
