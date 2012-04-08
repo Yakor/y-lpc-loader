@@ -43,6 +43,7 @@ main (int argc, char *argv[], char *env[])
   int               sdram_address = -1;
   int               conf_ok = 0;
   int               prnt_all_char = 0;
+  int               dont_exit = 0;
   executables_t    *ex;
 
   static const struct option long_opt[] = {
@@ -54,9 +55,10 @@ main (int argc, char *argv[], char *env[])
     {"secondary-address", required_argument, NULL, 'd'},
     {"port", required_argument, NULL, 'p'},
     {"print-all-char", no_argument, NULL, 'a'},
+    {"wait", no_argument, NULL, 'w'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:p:s:i:d:f:a";
+  const char       *short_opt_s = "hc:p:s:i:d:f:aw";
 
   printf (Y_LPC_LOADER_FULL_NAME "\n\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
@@ -105,6 +107,11 @@ main (int argc, char *argv[], char *env[])
             prnt_all_char = 1;
             break;
           }
+        case 'w':
+          {
+            dont_exit = 1;
+            break;
+          }
         }
       opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
     }
@@ -131,6 +138,7 @@ main (int argc, char *argv[], char *env[])
     }
 
   prnt_all_char |= config.prnt_all_char;
+  config.dont_exit |= dont_exit;
 
   if (port)
     {
@@ -161,6 +169,7 @@ main (int argc, char *argv[], char *env[])
 
   printf ("\nPort: %s\n", config.port);
   printf ("PrintAllChar: %i\n", prnt_all_char);
+  printf ("DontExit: %i\n", config.dont_exit);
   for (i = 0; i < config.qty_exec; i++)
     {
       printf ("%i\n", i + 1);
@@ -210,6 +219,15 @@ main (int argc, char *argv[], char *env[])
         {
           usleep (500000);
         }
+
+      if (config.dont_exit && (i + 1 == config.qty_exec))
+        {
+          while (1)
+            {
+              port_to_stdout (port_fd);
+            }
+        }
+
       printf ("\n");
     }
 
@@ -508,4 +526,23 @@ create_str (char **dest, const char *source)
   strncpy (*dest, source, len);
 
   return 1;
+}
+
+/**
+ * Read char from port and send to stdout
+ *
+ * @param port_fd port file descriptor
+ *
+ * @return readed char
+ */
+
+char
+port_to_stdout (int port_fd)
+{
+  char              byte = 0;
+
+  if (read (port_fd, &byte, 1) == 1)
+    putchar (byte);
+
+  return byte;
 }

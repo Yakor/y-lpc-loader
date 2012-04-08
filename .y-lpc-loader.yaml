@@ -1,5 +1,6 @@
 Port: /dev/ttyS0
 PrintAllChar: 1
+wait: 1
 Exec:
 - PrimaryFileName: "erase_nand.bin"
 - PrimaryFileName: "burner_kickstart.bin"
