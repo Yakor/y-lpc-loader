@@ -65,6 +65,7 @@ Config can have difference exeks count.
     -i, --primary-address    primary file load address
     -d, --secondary-address  secondary file load address
     -a, --print-all-char     Output all char
+    -w, --wait               Wait, dont exit after last exec
 
 Comand line options have greater priority vs config file options. If specified `primary execurable file` sequence of execs in config would be ignored.
 

@@ -16,8 +16,9 @@
 #define CONFIG_SECONDARY_FILENAME "SecondaryFileName"    /**< Name of option of second exec in config file */
 #define CONFIG_SDRAM_ADDRESS "SDRAMaddress"              /**< Name of option of second exec load address in config file */
 #define CONFIG_PORT "Port"                               /**< Name of option of port in config file */
-#define CONFIG_PRINT_ALL_CHAR "PrintAllChar"             /**< Name of otion  that swith output type*/
+#define CONFIG_PRINT_ALL_CHAR "PrintAllChar"             /**< Name of option that swith output type */
 #define CONFIG_EXECUTABLES "Exec"                        /**< Name of option that start sewuence of execs */
+#define CONFIG_DONT_EXIT "Wait"                          /**< Name of option that disable exit */
 #define DEFAULT_CONFIG_FILE_NAME "~/.y-lpc-loader.yaml"  /**< Default config name */
 #define DEFAULT_IRAM_ADDRESS 0x0000                      /**< Default first exec load address */
 #define DEFAULT_SDRAM_ADDRESS 0x80000004                 /**< Default secont exec load address */
@@ -39,6 +40,7 @@ typedef struct
 {
   char             *port;                    /**< port */
   int               prnt_all_char;           /**< if 1 print all incoming char */
+  int               dont_exit;               /**< if 1 dont exit after last exec */
   int               qty_exec;                /**< qty of first execs */
   executables_t    *executables;             /**< pointer to array of executables */
 } config_t;
