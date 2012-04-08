@@ -1,0 +1,3 @@
+PROJECT_NAME     = Y-LPC-loader
+FILE_PATTERNS    = *.c *.h
+GENERATE_LATEX   = no

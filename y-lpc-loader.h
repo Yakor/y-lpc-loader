@@ -1,3 +1,12 @@
+/**
+ * @file   y-lpc-loader.h
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ *
+ * @brief defines and declared functions needed for y-lpc-loader.c
+ *
+ *
+ */
+
 #ifndef Y_LPC_LOADER_H
 #define Y_LPC_LOADER_H
 
