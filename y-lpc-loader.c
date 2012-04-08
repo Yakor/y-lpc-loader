@@ -219,6 +219,15 @@ main (int argc, char *argv[], char *env[])
         {
           usleep (500000);
         }
+
+      if (config.dont_exit && (i + 1 == config.qty_exec))
+        {
+          while (1)
+            {
+              port_to_stdout (port_fd);
+            }
+        }
+
       printf ("\n");
     }
 
@@ -517,4 +526,23 @@ create_str (char **dest, const char *source)
   strncpy (*dest, source, len);
 
   return 1;
+}
+
+/**
+ * Read char from port and send to stdout
+ *
+ * @param port_fd port file descriptor
+ *
+ * @return readed char
+ */
+
+char
+port_to_stdout (int port_fd)
+{
+  char              byte = 0;
+
+  if (read (port_fd, &byte, 1) == 1)
+    putchar (byte);
+
+  return byte;
 }
