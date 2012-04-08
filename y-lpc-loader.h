@@ -1,6 +1,7 @@
 /**
  * @file   y-lpc-loader.h
  * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ * @copyright (c) 2012, Sergey Yakovlev this code is released uder BSD license. Can be found in LICENSE.
  *
  * @brief defines and declared functions needed for y-lpc-loader.c
  *

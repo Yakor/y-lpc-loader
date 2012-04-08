@@ -1,6 +1,7 @@
 /**
  * @file   yaml_macro.h
  * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ * @copyright (c) 2012, Sergey Yakovlev this code is released uder BSD license. Can be found in LICENSE.
  *
  * @brief  macros for read yaml config
  *
