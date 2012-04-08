@@ -1,0 +1,10 @@
+Port: /dev/ttyS0
+PrintAllChar: 1
+Exec:
+- PrimaryFileName: "erase_nand.bin"
+- PrimaryFileName: "burner_kickstart.bin"
+  SecondaryFileName: "kickstart.bin"
+- PrimaryFileName: "burner_s1app.bin"
+  IRAMaddress: 0x0000
+  SecondaryFileName: "s1l_from_kick.bin"
+  SDRAMaddress: 0x80000004

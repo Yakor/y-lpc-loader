@@ -30,7 +30,7 @@ Yet another lpc3250 loader
 
 Default config file `~/.lpc3250.yaml`
 
-Example
+Example can be found in source dir named '.y-lpc-loader.yaml'
 
     Port: /dev/ttyS0
     PrintAllChar: 1
