@@ -352,7 +352,11 @@ send_4_bytes_reverse (int port_fd, int num)
   for (i = 0; i < 4; i++)
     {
       byte_to_send = tmp & 0xff;
-      write (port_fd, &byte_to_send, 1);
+      if (write (port_fd, &byte_to_send, 1) != 1)
+        {
+          printf ("error write to port\n");
+          return 0;
+        }
       tmp = tmp >> 8;
     }
 
@@ -383,12 +387,15 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
   fread (buf, file_size, 1, f);
   fclose (f);
 
-  send_4_bytes_reverse (port_fd, addr);
-  send_4_bytes_reverse (port_fd, file_size);
+  if (!send_4_bytes_reverse (port_fd, addr))
+    return 0;
+  if (!send_4_bytes_reverse (port_fd, file_size))
+    return 0;
 
   if (confirm)
     {
-      wait_byte (port_fd, confirm, 0, prnt_all_char, 0);
+      if (!wait_byte (port_fd, confirm, 0, prnt_all_char, 0))
+        return 0;
     }
 
   tmp = 0;
