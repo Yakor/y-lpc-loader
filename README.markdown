@@ -30,7 +30,7 @@ Yet another lpc3250 loader
 
 Default config file `~/.lpc3250.yaml`
 
-Example can be found in source dir named '.y-lpc-loader.yaml'
+Example can be found in source dir named `.y-lpc-loader.yaml`
 
     Port: /dev/ttyS0
     PrintAllChar: 1
@@ -45,13 +45,13 @@ Example can be found in source dir named '.y-lpc-loader.yaml'
       SDRAMaddress: 0x80000004
 
 * Port - COM port
+* PrintAllChar - Output all incoming char
+* Wait - Wait, dont exit after last exec
 * Exec - Sequence of executables
 * PrimaryFileName - Primary Boot
 * IRAMaddress - IRAM address
 * SecondaryFileName - Secondary executable
 * SDRAMaddress - SDRAM address
-* PrintAllChar - Output all incoming char
-* Wait - Wait, dont exit after last exec
 
 Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address,
 then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000,
@@ -63,7 +63,7 @@ Config can have difference exeks count.
 
     -h, --help               help
     -c, --config             file use alternate config file
-    -p, --port               port
+    -p, --port               COM port
     -f, --first              primary execurable file
     -s, --second             secondary execurable file
     -i, --primary-address    primary file load address

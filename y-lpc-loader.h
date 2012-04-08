@@ -15,7 +15,7 @@
   "Usage:\n"                                                            \
   "-h, --help               help\n"                                     \
   "-c, --config             file use alternate config file\n"           \
-  "-p, --port               port\n"                                     \
+  "-p, --port               COM port\n"                                 \
   "-f, --first              primary execurable file\n"                  \
   "-s, --second             secondary execurable file\n"                \
   "-i, --primary-address    primary file load address\n"                \
