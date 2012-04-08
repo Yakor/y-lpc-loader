@@ -30,10 +30,11 @@ Yet another lpc3250 loader
 
 Default config file `~/.lpc3250.yaml`
 
-Example
+Example can be found in source dir named `.y-lpc-loader.yaml`
 
     Port: /dev/ttyS0
     PrintAllChar: 1
+    Wait: 1
     Exec:
     - PrimaryFileName: "erase_nand.bin"
     - PrimaryFileName: "burner_kickstart.bin"
@@ -44,14 +45,17 @@ Example
       SDRAMaddress: 0x80000004
 
 * Port - COM port
+* PrintAllChar - Output all incoming char
+* Wait - Wait, dont exit after last exec
 * Exec - Sequence of executables
 * PrimaryFileName - Primary Boot
 * IRAMaddress - IRAM address
 * SecondaryFileName - Secondary executable
 * SDRAMaddress - SDRAM address
-* PrintAllChar - Output all incoming char
 
-Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address, then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000 then load `s1l_from_kick.bin` on 0x80000004
+Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address,
+then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000,
+then load `s1l_from_kick.bin` on 0x80000004 and after reset board print board output
 
 Config can have difference exeks count.
 
@@ -59,12 +63,13 @@ Config can have difference exeks count.
 
     -h, --help               help
     -c, --config             file use alternate config file
-    -p, --port               port
+    -p, --port               COM port
     -f, --first              primary execurable file
     -s, --second             secondary execurable file
     -i, --primary-address    primary file load address
     -d, --secondary-address  secondary file load address
     -a, --print-all-char     Output all char
+    -w, --wait               Wait, dont exit after last exec
 
 Comand line options have greater priority vs config file options. If specified `primary execurable file` sequence of execs in config would be ignored.
 

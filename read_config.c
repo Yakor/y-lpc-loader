@@ -1,10 +1,11 @@
 /**
  * @file   read_config.c
- * @author  <yakor.spb@gmail.com>
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ * @copyright (c) 2012, Sergey Yakovlev this code is released uder BSD license. Can be found in LICENSE.
  *
  * @brief  Read config
  *
- * @todo  Сделать проверки на правильность конфигов чтоб никогда не падала
+ *
  */
 
 #include <yaml.h>
@@ -15,6 +16,15 @@
 #include "yaml_macro.h"
 #include "read_config.h"
 
+/**
+ * read y-lpc-loader config YAML
+ *
+ * @param file_name config file name
+ * @param config pointe to config_t struct
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 read_config_yaml (char *file_name, config_t * config)
 {
@@ -24,15 +34,22 @@ read_config_yaml (char *file_name, config_t * config)
   config->executables = 0;
   config->qty_exec = 0;
   config->port = 0;
-  config->prnt_all_char=0;
+  config->prnt_all_char = 0;
+  config->dont_exit = 0;
 
   MACRO_YAML_DOCUMENT (file_name,
-		       {
+                       {
                          MACRO_YAML_STRING (CONFIG_PORT, config->port,{});
                          MACRO_YAML_INT (CONFIG_PRINT_ALL_CHAR,
                                          tmp,
                                          {
                                            config->prnt_all_char=tmp;
+                                         }
+                                         );
+                         MACRO_YAML_INT (CONFIG_DONT_EXIT,
+                                         tmp,
+                                         {
+                                           config->dont_exit = tmp;
                                          }
                                          );
                          MACRO_YAML_SEQUENCE (CONFIG_EXECUTABLES, i,
@@ -70,6 +87,12 @@ read_config_yaml (char *file_name, config_t * config)
 
   return 1;
 }
+
+/**
+ * fills executables_t struct with default setting
+ *
+ * @param ex pointer to executables_t struct
+ */
 
 void
 default_setting (executables_t * ex)
