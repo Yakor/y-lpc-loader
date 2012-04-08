@@ -34,6 +34,7 @@ Example can be found in source dir named '.y-lpc-loader.yaml'
 
     Port: /dev/ttyS0
     PrintAllChar: 1
+    Wait: 1
     Exec:
     - PrimaryFileName: "erase_nand.bin"
     - PrimaryFileName: "burner_kickstart.bin"
@@ -50,8 +51,11 @@ Example can be found in source dir named '.y-lpc-loader.yaml'
 * SecondaryFileName - Secondary executable
 * SDRAMaddress - SDRAM address
 * PrintAllChar - Output all incoming char
+* Wait - Wait, dont exit after last exec
 
-Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address, then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000 then load `s1l_from_kick.bin` on 0x80000004
+Load `erase_nand.bin` on default IRAM address and executet. Load `burner_kickstart.bin` on default IRAM address,
+then load `kickstart.bin` on default SDRAM address. Load `burner_s1app.bin` on 0x0000,
+then load `s1l_from_kick.bin` on 0x80000004 and after reset board print board output
 
 Config can have difference exeks count.
 
