@@ -13,6 +13,14 @@
 #include <sys/stat.h>
 #include <string.h>
 
+/**
+ * macro to parse string config_name parametr to program_name var
+ *
+ * @param config_name parameter name in yaml config
+ * @param program_name parameter name in programm
+ * @param func additional init function
+ */
+
 #define MACRO_YAML_STRING(config_name,program_name,func)                \
   if(!strcmp((char *)event.data.scalar.value,(config_name)))            \
     {                                                                   \
@@ -25,12 +33,24 @@
       break;                                                            \
     }
 
+/**
+ * choise next yaml event
+ */
+
 #define MACRO_YAML_NEXT                         \
   if (!yaml_parser_parse(&parser, &event))      \
     {                                           \
       yaml_parser_delete(&parser);              \
       return 0;                                 \
     }                                           \
+
+/**
+ * macro to parse int config_name parametr to program_name var
+ *
+ * @param config_name parameter name in yaml config
+ * @param program_name parameter name in programm
+ * @param func additional init function
+ */
 
 #define MACRO_YAML_INT(config_name,program_name,func)                   \
   if(!strcmp((char *)event.data.scalar.value,(config_name)))            \

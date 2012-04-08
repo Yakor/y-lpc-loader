@@ -1,3 +1,13 @@
+/**
+ * @file   y-lpc-loader.h
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ *
+ * @brief defines and declared functions needed for y-lpc-loader.c
+ *
+ *
+ */
+
+
 #define HELP_STRING                                                     \
   "Usage:\n"                                                            \
   "-h, --help               help\n"                                     \
