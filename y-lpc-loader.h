@@ -1,3 +1,6 @@
+#ifndef Y_LPC_LOADER_H
+#define Y_LPC_LOADER_H
+
 #define HELP_STRING                                                     \
   "Usage:\n"                                                            \
   "-h, --help               help\n"                                     \
@@ -16,3 +19,5 @@ int               send_file_to_port (int port_fd, char *file_name, int addr, cha
                                      int prnt_char);
 int               send_4_bytes_reverse (int port_fd, int num);
 int               create_str (char **dest, const char *source);
+
+#endif /* Y_LPC_LOADER_H */

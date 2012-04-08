@@ -9,6 +9,9 @@
  * Все временные malloc закончить free
  */
 
+#ifndef YAML_MACRO_H
+#define YAML_MACRO_H
+
 #include <yaml.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -212,3 +215,5 @@
       yaml_event_delete(&event);                                        \
     }                                                                   \
   yaml_parser_delete(&parser);
+
+#endif /* YAML_MACRO_H */
