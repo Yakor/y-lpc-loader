@@ -1,13 +1,13 @@
-
 /**
- * @file   lpc3250_loader.c
- * @author  <yakor.spb@gmail.com>
- * @date   Thu Mar 15 19:27:35 2012
+ * @file   y-lpc-loader.c
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ * @copyright (c) 2012, Sergey Yakovlev this code is released uder BSD license. Can be found in LICENSE.
  *
- * @brief lpc3250 loader
+ * @brief  lpc32xx loader
  *
  *
  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,6 +23,7 @@
 #include <getopt.h>
 #include "read_config.h"
 #include "y-lpc-loader.h"
+#include "version.h"
 
 int
 main (int argc, char *argv[], char *env[])
@@ -42,6 +43,7 @@ main (int argc, char *argv[], char *env[])
   int               sdram_address = -1;
   int               conf_ok = 0;
   int               prnt_all_char = 0;
+  int               dont_exit = 0;
   executables_t    *ex;
 
   static const struct option long_opt[] = {
@@ -53,11 +55,12 @@ main (int argc, char *argv[], char *env[])
     {"secondary-address", required_argument, NULL, 'd'},
     {"port", required_argument, NULL, 'p'},
     {"print-all-char", no_argument, NULL, 'a'},
+    {"wait", no_argument, NULL, 'w'},
     {NULL, no_argument, NULL, 0}
   };
-  const char       *short_opt_s = "hc:p:s:i:d:f:a";
+  const char       *short_opt_s = "hc:p:s:i:d:f:aw";
 
-  printf ("y-lpc-loader\n");
+  printf (Y_LPC_LOADER_FULL_NAME "\n\n");
   opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
   while (opt != -1)
     {
@@ -104,6 +107,11 @@ main (int argc, char *argv[], char *env[])
             prnt_all_char = 1;
             break;
           }
+        case 'w':
+          {
+            dont_exit = 1;
+            break;
+          }
         }
       opt = getopt_long (argc, argv, short_opt_s, long_opt, &long_index);
     }
@@ -130,6 +138,7 @@ main (int argc, char *argv[], char *env[])
     }
 
   prnt_all_char |= config.prnt_all_char;
+  config.dont_exit |= dont_exit;
 
   if (port)
     {
@@ -160,6 +169,7 @@ main (int argc, char *argv[], char *env[])
 
   printf ("\nPort: %s\n", config.port);
   printf ("PrintAllChar: %i\n", prnt_all_char);
+  printf ("DontExit: %i\n", config.dont_exit);
   for (i = 0; i < config.qty_exec; i++)
     {
       printf ("%i\n", i + 1);
@@ -209,11 +219,28 @@ main (int argc, char *argv[], char *env[])
         {
           usleep (500000);
         }
+
+      if (config.dont_exit && (i + 1 == config.qty_exec))
+        {
+          while (1)
+            {
+              port_to_stdout (port_fd);
+            }
+        }
+
       printf ("\n");
     }
 
   return 0;
 }
+
+/**
+ * Seting up serial port
+ *
+ * @param port_fd port file descriptor
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 setup_port (int port_fd)
@@ -236,6 +263,18 @@ setup_port (int port_fd)
   tcsetattr (port_fd, TCIFLUSH, &tio);
   return 1;
 }
+
+/**
+ * waiting for specified byte
+ *
+ * @param port_fd port file descriptor
+ * @param byte byte for wait
+ * @param skip if 1 skip not matched bytes
+ * @param prnt_all_char if 1 print all char incoming
+ * @param pure_output if 1 pure output without helper messages
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
@@ -315,6 +354,16 @@ wait_byte (int port_fd, char byte, int skip, int prnt_all_char, int pure_output)
   return 1;
 }
 
+/**
+ * Sending specified byte to port
+ *
+ * @param port_fd port file descriptor
+ * @param byte byte to sent
+ * @param prnt_all_char switch info messages type
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 send_byte (int port_fd, char byte, int prnt_all_char)
 {
@@ -340,6 +389,15 @@ send_byte (int port_fd, char byte, int prnt_all_char)
   return 1;
 }
 
+/**
+ * send to port 32 bits. Least significant byte first
+ *
+ * @param port_fd port file descriptor
+ * @param num int to send
+ *
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 send_4_bytes_reverse (int port_fd, int num)
 {
@@ -362,6 +420,18 @@ send_4_bytes_reverse (int port_fd, int num)
 
   return 1;
 }
+
+/**
+ * Send specified file to port
+ *
+ * @param port_fd port file descriptor
+ * @param file_name file to send
+ * @param addr start address
+ * @param confirm confirm char, if == 0 file transfered without confirm
+ * @param prnt_all_char swith info messages type
+ *
+ * @return 1 if succesfully otherwise 0
+ */
 
 int
 send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prnt_all_char)
@@ -435,6 +505,16 @@ send_file_to_port (int port_fd, char *file_name, int addr, char confirm, int prn
   return 1;
 }
 
+/**
+ * Create string from source.
+ *
+ * @param dest output string
+ * @param source input string
+ *
+ * @warning Dangerous!
+ * @return 1 if succesfully otherwise 0
+ */
+
 int
 create_str (char **dest, const char *source)
 {
@@ -446,4 +526,23 @@ create_str (char **dest, const char *source)
   strncpy (*dest, source, len);
 
   return 1;
+}
+
+/**
+ * Read char from port and send to stdout
+ *
+ * @param port_fd port file descriptor
+ *
+ * @return readed char
+ */
+
+char
+port_to_stdout (int port_fd)
+{
+  char              byte = 0;
+
+  if (read (port_fd, &byte, 1) == 1)
+    putchar (byte);
+
+  return byte;
 }

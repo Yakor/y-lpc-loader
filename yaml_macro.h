@@ -1,19 +1,29 @@
 /**
- * @file   ReadConfig.c
- * @author  <yakor@Lenovo.net.home>
- * @date   Tue Sep 28 01:49:46 2010
+ * @file   yaml_macro.h
+ * @author Sergey Yakovlev <yakor.spb@gmail.com>
+ * @copyright (c) 2012, Sergey Yakovlev this code is released uder BSD license. Can be found in LICENSE.
  *
- * @brief  Читает конфиги
+ * @brief  macros for read yaml config
  *
- * @todo  Сделать проверки на правильность конфигов чтоб никогда не падала
- * Все временные malloc закончить free
+ *
  */
+
+#ifndef YAML_MACRO_H
+#define YAML_MACRO_H
 
 #include <yaml.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+
+/**
+ * macro to parse string config_name parametr to program_name var
+ *
+ * @param config_name parameter name in yaml config
+ * @param program_name parameter name in programm
+ * @param func additional init function
+ */
 
 #define MACRO_YAML_STRING(config_name,program_name,func)                \
   if(!strcmp((char *)event.data.scalar.value,(config_name)))            \
@@ -27,12 +37,24 @@
       break;                                                            \
     }
 
+/**
+ * choise next yaml event
+ */
+
 #define MACRO_YAML_NEXT                         \
   if (!yaml_parser_parse(&parser, &event))      \
     {                                           \
       yaml_parser_delete(&parser);              \
       return 0;                                 \
     }                                           \
+
+/**
+ * macro to parse int config_name parameter to program_name var
+ *
+ * @param config_name parameter name in yaml config
+ * @param program_name parameter name in programm
+ * @param func additional init function
+ */
 
 #define MACRO_YAML_INT(config_name,program_name,func)                   \
   if(!strcmp((char *)event.data.scalar.value,(config_name)))            \
@@ -212,3 +234,5 @@
       yaml_event_delete(&event);                                        \
     }                                                                   \
   yaml_parser_delete(&parser);
+
+#endif /* YAML_MACRO_H */
