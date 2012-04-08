@@ -17,7 +17,7 @@
 #define CONFIG_PORT "Port"                               /**< Name of option of port in config file */
 #define CONFIG_PRINT_ALL_CHAR "PrintAllChar"             /**< Name of otion  that swith output type*/
 #define CONFIG_EXECUTABLES "Exec"                        /**< Name of option that start sewuence of execs */
-#define DEFAULT_CONFIG_FILE_NAME "~/.lpc3250.yaml"       /**< Default config name */
+#define DEFAULT_CONFIG_FILE_NAME "~/.y-lpc-loader.yaml"  /**< Default config name */
 #define DEFAULT_IRAM_ADDRESS 0x0000                      /**< Default first exec load address */
 #define DEFAULT_SDRAM_ADDRESS 0x80000004                 /**< Default secont exec load address */
 #define DEFAULT_PORT "/dev/ttyS0"                        /**< Default port */
