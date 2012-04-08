@@ -216,7 +216,7 @@ main (int argc, char *argv[], char *env[])
 }
 
 /**
- * Seting ip serial port
+ * Seting up serial port
  *
  * @param port_fd port file descriptor
  *
@@ -246,7 +246,7 @@ setup_port (int port_fd)
 }
 
 /**
- * waiting for byte specified byte
+ * waiting for specified byte
  *
  * @param port_fd port file descriptor
  * @param byte byte for wait

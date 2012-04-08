@@ -48,7 +48,7 @@
     }                                           \
 
 /**
- * macro to parse int config_name parametr to program_name var
+ * macro to parse int config_name parameter to program_name var
  *
  * @param config_name parameter name in yaml config
  * @param program_name parameter name in programm
