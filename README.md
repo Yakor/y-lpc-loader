@@ -28,7 +28,7 @@ Yet another lpc3250 loader for linux.
 
 ### Config file ###
 
-Default config file `~/.lpc3250.yaml`
+Default config file `~/.y-lpc-loader.yaml`
 
 Example can be found in source dir named `.y-lpc-loader.yaml`
 
