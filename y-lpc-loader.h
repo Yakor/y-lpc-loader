@@ -20,8 +20,8 @@
   "-s, --second             secondary execurable file\n"                \
   "-i, --primary-address    primary file load address\n"                \
   "-d, --secondary-address  secondary file load address\n"              \
-  "-a, --print-all-char     output all comunicates computer and board"  \
-  "-w, --wait               Wait, dont exit after last exec"
+  "-a, --print-all-char     output all comunicates computer and board\n" \
+  "-w, --wait               Wait, dont exit after last exec\n"
 
 int               main (int argc, char *argv[], char *env[]);
 int               setup_port (int port_fd);
