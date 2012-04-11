@@ -1,13 +1,13 @@
-### y-lpc-loader LICENCE ###
+## y-lpc-loader LICENCE ##
 
 y-lpc-loader is a tool that can load code to LPC32xx.
 
 y-lpc-loader is distributed under the terms of the "BSD" licence, as
 specified below.
 
-Copyright (c) 2012, Yakovlev Sergey
+Copyright (c) 2012, Sergey Yakovlev
 
-## THE "BSD" LICENCE ##
+### THE "BSD" LICENCE ###
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
