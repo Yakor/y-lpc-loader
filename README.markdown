@@ -2,7 +2,7 @@
 
 ### What is it ###
 
-Yet another lpc3250 loader
+Yet another lpc3250 loader for linux.
 
 ### Features ###
 
@@ -76,3 +76,7 @@ Comand line options have greater priority vs config file options. If specified `
 ### Using ###
 
 Start y-lpc-loader, reset board. Wait for execs or burning. For start next exec reset board twice
+
+### Copyright ###
+
+Copyright (c) 2012, Yakovlev Sergey. Licensed under the "BSD" license
